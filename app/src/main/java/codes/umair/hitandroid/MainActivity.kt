@@ -27,9 +27,18 @@ class MainActivity : AppCompatActivity() {
                 .setMessage("Your highest score is $highscore")
                 .setPositiveButtonText("OK")
                 .setPositiveButtonListener(object : MaDialogListener{
-                    override fun onClick() {
-
-                    }
+                    override fun onClick() {}
+                })
+                .build()
+        }
+        tv_help.setOnClickListener {
+            MaDialog.Builder(this)
+                .setCustomFont(R.font.bubblegum_sans)
+                .setTitle("Help")
+                .setMessage("Hit all the Pumpkin Man on the screen. If you miss 5 Pumpkin Man your game is over. Try to last as long as possible.")
+                .setPositiveButtonText("OK")
+                .setPositiveButtonListener(object : MaDialogListener{
+                    override fun onClick() {}
                 })
                 .build()
         }
