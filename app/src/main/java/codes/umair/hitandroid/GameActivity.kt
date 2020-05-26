@@ -5,11 +5,15 @@ import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_game.*
 import spencerstudios.com.jetdblib.JetDB
 import umairayub.madialog.MaDialog
@@ -26,14 +30,21 @@ class GameActivity : AppCompatActivity() {
     private var which : Int? = 0
     private var last : Int? = 0
     private var animationDrawable : AnimationDrawable? = null
-
+    private lateinit var mInterstitialAd : InterstitialAd
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
         
         r = Random()
-        
+
+        MobileAds.initialize(this) {}
+        mInterstitialAd = InterstitialAd(this)
+        mInterstitialAd.adUnitId = "ca-app-pub-3940256099942544/1033173712"
+        mInterstitialAd.loadAd(AdRequest.Builder().build())
+
+
+
         imageView.visibility = View.INVISIBLE
         imageView2.visibility = View.INVISIBLE
         imageView3.visibility = View.INVISIBLE
@@ -209,6 +220,11 @@ class GameActivity : AppCompatActivity() {
         val highscore = JetDB.getInt(this,"highscore",0)
         if (score!! > highscore){
             JetDB.putInt(this,score!!,"highscore")
+        }
+        if (mInterstitialAd.isLoaded) {
+            mInterstitialAd.show()
+        }else{
+            Log.d("TAG", "The interstitial wasn't loaded yet.")
         }
     }
 }
