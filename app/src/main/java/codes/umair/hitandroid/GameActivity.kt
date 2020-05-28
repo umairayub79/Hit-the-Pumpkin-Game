@@ -31,6 +31,10 @@ class GameActivity : AppCompatActivity() {
     private var last : Int? = 0
     private var animationDrawable : AnimationDrawable? = null
     private lateinit var mInterstitialAd : InterstitialAd
+    private lateinit var handler: Handler
+    private lateinit var handler1: Handler
+    private lateinit var runnable: Runnable
+    private lateinit var runnable1: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,9 +79,11 @@ class GameActivity : AppCompatActivity() {
             score = 0
             tv_lives.text = "Lives : $left"
             tv_score.text = "Score : $score"
-            Handler().postDelayed({
+            handler = Handler()
+            runnable = Runnable {
                 theGameActions()
-            },1000)
+            }
+            handler.postDelayed(runnable, 1000)
             button.visibility = View.INVISIBLE
         }
     }
@@ -154,7 +160,8 @@ class GameActivity : AppCompatActivity() {
 
         animationDrawable?.start()
 
-        Handler().postDelayed({
+        handler1 = Handler()
+        runnable1 = Runnable {
             imageView.visibility = View.INVISIBLE
             imageView2.visibility = View.INVISIBLE
             imageView3.visibility = View.INVISIBLE
@@ -180,32 +187,15 @@ class GameActivity : AppCompatActivity() {
             }
 
             if (left!! < 1){
-                val highscore = JetDB.getInt(this,"highscore",0)
-                if (score!! > highscore){
-                    JetDB.putInt(this,score!!,"highscore")
-                }
-                MaDialog.Builder(this)
-                    .setCustomFont(R.font.bubblegum_sans)
-                    .setTitle("Game Over")
-                    .setMessage("Score $score")
-                    .setPositiveButtonText("OK")
-                    .setPositiveButtonListener(object : MaDialogListener{
-                        override fun onClick() {
-                            left = 5
-                            score = 0
-                            tv_lives.text = "Lives : $left"
-                            tv_score.text = "Score : $score"
-                        }
-                    })
-                    .setCancelableOnOutsideTouch(false)
-                    .build()
-                button.visibility = View.VISIBLE
+                gameOver()
             }else {
                 theGameActions()
             }
-
-        }, fps!!)
+        }
+        handler1.postDelayed(runnable1, fps!!)
     }
+
+
     private fun update(view:ImageView){
         window.decorView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
         templeft = 1
@@ -216,7 +206,6 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         val highscore = JetDB.getInt(this,"highscore",0)
         if (score!! > highscore){
             JetDB.putInt(this,score!!,"highscore")
@@ -226,5 +215,71 @@ class GameActivity : AppCompatActivity() {
         }else{
             Log.d("TAG", "The interstitial wasn't loaded yet.")
         }
+        handler.removeCallbacks(runnable)
+        handler1.removeCallbacks(runnable1)
+        super.onBackPressed()
+    }
+
+    override fun onPause() {
+        handler.removeCallbacks(runnable)
+        handler1.removeCallbacks(runnable1)
+
+        imageView.visibility = View.INVISIBLE
+        imageView2.visibility = View.INVISIBLE
+        imageView3.visibility = View.INVISIBLE
+        imageView4.visibility = View.INVISIBLE
+        imageView5.visibility = View.INVISIBLE
+        imageView6.visibility = View.INVISIBLE
+
+        imageView.isEnabled = false
+        imageView2.isEnabled = false
+        imageView3.isEnabled = false
+        imageView4.isEnabled = false
+        imageView5.isEnabled = false
+        imageView6.isEnabled = false
+
+        button.visibility = View.VISIBLE
+        val highscore = JetDB.getInt(this, "highscore", 0)
+        if (score!! > highscore) {
+            JetDB.putInt(this, score!!, "highscore")
+        }
+        super.onPause()
+    }
+
+
+    private fun gameOver() {
+        imageView.visibility = View.INVISIBLE
+        imageView2.visibility = View.INVISIBLE
+        imageView3.visibility = View.INVISIBLE
+        imageView4.visibility = View.INVISIBLE
+        imageView5.visibility = View.INVISIBLE
+        imageView6.visibility = View.INVISIBLE
+
+        imageView.isEnabled = false
+        imageView2.isEnabled = false
+        imageView3.isEnabled = false
+        imageView4.isEnabled = false
+        imageView5.isEnabled = false
+        imageView6.isEnabled = false
+        val highscore = JetDB.getInt(this, "highscore", 0)
+        if (score!! > highscore) {
+            JetDB.putInt(this, score!!, "highscore")
+        }
+        MaDialog.Builder(this)
+            .setCustomFont(R.font.bubblegum_sans)
+            .setTitle("Game Over")
+            .setMessage("Score $score")
+            .setPositiveButtonText("OK")
+            .setPositiveButtonListener(object : MaDialogListener {
+                override fun onClick() {
+                    left = 5
+                    score = 0
+                    tv_lives.text = "Lives : $left"
+                    tv_score.text = "Score : $score"
+                }
+            })
+            .setCancelableOnOutsideTouch(false)
+            .build()
+        button.visibility = View.VISIBLE
     }
 }
