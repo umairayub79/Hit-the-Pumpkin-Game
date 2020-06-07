@@ -2,7 +2,6 @@ package codes.umair.hitandroid
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.AnimationDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -10,10 +9,13 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.games.Games
 import kotlinx.android.synthetic.main.activity_game.*
 import spencerstudios.com.jetdblib.JetDB
 import umairayub.madialog.MaDialog
@@ -36,6 +38,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var runnable: Runnable
     private lateinit var runnable1: Runnable
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
@@ -46,7 +49,6 @@ class GameActivity : AppCompatActivity() {
         mInterstitialAd = InterstitialAd(this)
         mInterstitialAd.adUnitId = "ca-app-pub-3940256099942544/1033173712"
         mInterstitialAd.loadAd(AdRequest.Builder().build())
-
 
 
         imageView.visibility = View.INVISIBLE
@@ -209,6 +211,10 @@ class GameActivity : AppCompatActivity() {
         val highscore = JetDB.getInt(this,"highscore",0)
         if (score!! > highscore){
             JetDB.putInt(this,score!!,"highscore")
+            GoogleSignIn.getLastSignedInAccount(this)?.let {
+                Games.getLeaderboardsClient(this, it)
+                    .submitScore(getString(R.string.leaderboard_score), score!!.toLong())
+            }
         }
         if (mInterstitialAd.isLoaded) {
             mInterstitialAd.show()
@@ -264,6 +270,10 @@ class GameActivity : AppCompatActivity() {
         val highscore = JetDB.getInt(this, "highscore", 0)
         if (score!! > highscore) {
             JetDB.putInt(this, score!!, "highscore")
+            GoogleSignIn.getLastSignedInAccount(this)?.let {
+                Games.getLeaderboardsClient(this, it)
+                    .submitScore(getString(R.string.leaderboard_score), score!!.toLong())
+            }
         }
         MaDialog.Builder(this)
             .setCustomFont(R.font.bubblegum_sans)
