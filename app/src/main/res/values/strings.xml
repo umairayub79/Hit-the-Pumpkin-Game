@@ -7,4 +7,9 @@
     <string name="help">Help</string>
     <string name="helpMessage">Hit all the Pumpkin Man on the screen. If you miss 5 Pumpkin Man your game is over. Try to last as long as possible.</string>
     <string name="sign_out">Sign out</string>
+    <string name="vibration_on">Vibration ON</string>
+    <string name="vibration_off">Vibration OFF</string>
+
+    <string name="sound_on">Sound ON</string>
+    <string name="sound_off">Sound OFF</string>
 </resources>

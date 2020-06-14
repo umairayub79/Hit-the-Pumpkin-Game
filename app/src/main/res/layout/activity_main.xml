@@ -11,6 +11,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/bubblegum_sans"
         android:gravity="center"
         android:text="@string/app_name"
@@ -19,10 +20,10 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.189" />
+        app:layout_constraintVertical_bias="0.138" />
 
     <TextView
         android:id="@+id/tv_highscore"
@@ -31,7 +32,7 @@
         android:layout_marginTop="24dp"
         android:fontFamily="@font/bubblegum_sans"
         android:text="@string/high_score"
-        android:textSize="30sp"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_play" />
@@ -42,12 +43,13 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/bubblegum_sans"
         android:text="@string/play"
-        android:textSize="30sp"
+        android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.196" />
+        app:layout_constraintVertical_bias="0.083" />
 
     <TextView
         android:id="@+id/tv_leaderboard"
@@ -56,10 +58,35 @@
         android:layout_marginTop="24dp"
         android:fontFamily="@font/bubblegum_sans"
         android:text="@string/leaderboard"
-        android:textSize="30sp"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_highscore" />
+
+    <TextView
+        android:id="@+id/sound_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/bubblegum_sans"
+        android:text="@string/sound_on"
+        android:textSize="26sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vibration_btn" />
+
+    <TextView
+        android:id="@+id/vibration_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/bubblegum_sans"
+        android:text="@string/vibration_on"
+        android:textSize="26sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_leaderboard" />
 
     <TextView
         android:id="@+id/tv_help"
@@ -68,10 +95,10 @@
         android:layout_marginTop="24dp"
         android:fontFamily="@font/bubblegum_sans"
         android:text="@string/help"
-        android:textSize="30sp"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_leaderboard" />
+        app:layout_constraintTop_toBottomOf="@+id/sound_btn" />
 
     <TextView
         android:id="@+id/signout_btn"
@@ -79,8 +106,8 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/bubblegum_sans"
         android:text="@string/sign_out"
-        android:visibility="gone"
         android:textSize="30sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,6 +117,8 @@
         android:id="@+id/signin_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

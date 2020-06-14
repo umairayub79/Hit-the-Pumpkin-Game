@@ -20,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     // Request code used to invoke sign in user interactions.
     private val RC_SIGN_IN = 9001
     private val RC_LEADERBOARD_UI = 9004
+    private var isSoundON = true
+    private var isVibrationON = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,20 +29,34 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
+        isVibrationON = JetDB.getBoolean(this, "vibration", true)
+        isSoundON = JetDB.getBoolean(this, "sound", true)
+
+        if (isVibrationON) {
+            vibration_btn.text = getString(R.string.vibration_on)
+        } else {
+            vibration_btn.text = getString(R.string.vibration_off)
+        }
+        if (isSoundON) {
+            sound_btn.text = getString(R.string.sound_on)
+        } else {
+            sound_btn.text = getString(R.string.sound_off)
+        }
+
         tv_play.setOnClickListener {
-            val intent = Intent(this,GameActivity::class.java)
+            val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
         }
 
         tv_highscore.setOnClickListener {
-            val highscore = JetDB.getInt(this,"highscore",0)
+            val highscore = JetDB.getInt(this, "highscore", 0)
 
             MaDialog.Builder(this)
                 .setCustomFont(R.font.bubblegum_sans)
                 .setTitle(getString(R.string.high_score))
                 .setMessage("Your highest score is $highscore")
                 .setPositiveButtonText("OK")
-                .setPositiveButtonListener(object : MaDialogListener{
+                .setPositiveButtonListener(object : MaDialogListener {
                     override fun onClick() {}
                 })
                 .build()
@@ -50,13 +66,36 @@ class MainActivity : AppCompatActivity() {
             showLeaderboard()
         }
 
+        sound_btn.setOnClickListener {
+            if (isSoundON) {
+                isSoundON = false
+                JetDB.putBoolean(this, isSoundON, "sound")
+                sound_btn.text = getString(R.string.sound_off)
+            } else {
+                isSoundON = true
+                JetDB.putBoolean(this, isSoundON, "sound")
+                sound_btn.text = getString(R.string.sound_on)
+            }
+        }
+        vibration_btn.setOnClickListener {
+            if (isVibrationON) {
+                isVibrationON = false
+                JetDB.putBoolean(this, isVibrationON, "vibration")
+                vibration_btn.text = getString(R.string.vibration_off)
+            } else {
+                isVibrationON = true
+                JetDB.putBoolean(this, isVibrationON, "vibration")
+                vibration_btn.text = getString(R.string.vibration_on)
+            }
+        }
+
         tv_help.setOnClickListener {
             MaDialog.Builder(this)
                 .setCustomFont(R.font.bubblegum_sans)
                 .setTitle(getString(R.string.help))
                 .setMessage(getString(R.string.helpMessage))
                 .setPositiveButtonText("OK")
-                .setPositiveButtonListener(object : MaDialogListener{
+                .setPositiveButtonListener(object : MaDialogListener {
                     override fun onClick() {}
                 })
                 .build()

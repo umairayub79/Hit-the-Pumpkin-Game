@@ -2,6 +2,7 @@ package codes.umair.hitandroid
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.AnimationDrawable
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -22,27 +23,32 @@ import umairayub.madialog.MaDialog
 import umairayub.madialog.MaDialogListener
 import java.util.*
 
+
 class GameActivity : AppCompatActivity() {
 
-    private lateinit var r : Random
-    private var score : Int? = 0
-    private var fps : Long? = 1000
-    private var left : Int? = 5
-    private var templeft : Int? = 0
-    private var which : Int? = 0
-    private var last : Int? = 0
-    private var animationDrawable : AnimationDrawable? = null
-    private lateinit var mInterstitialAd : InterstitialAd
+    private lateinit var r: Random
+    private var score: Int? = 0
+    private var fps: Long? = 1000
+    private var left: Int? = 5
+    private var templeft: Int? = 0
+    private var which: Int? = 0
+    private var last: Int? = 0
+    private var animationDrawable: AnimationDrawable? = null
+    private lateinit var mInterstitialAd: InterstitialAd
     private lateinit var handler: Handler
     private lateinit var handler1: Handler
     private lateinit var runnable: Runnable
     private lateinit var runnable1: Runnable
+    private var isRunnin = false
+    private var isSoundON = true
+    private var isVibrationON = true
+    private lateinit var mp: MediaPlayer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        
+
         r = Random()
 
         MobileAds.initialize(this) {}
@@ -50,33 +56,30 @@ class GameActivity : AppCompatActivity() {
         mInterstitialAd.adUnitId = "ca-app-pub-3940256099942544/1033173712"
         mInterstitialAd.loadAd(AdRequest.Builder().build())
 
+        mp = MediaPlayer.create(this, R.raw.click)
+        isSoundON = JetDB.getBoolean(this, "sound", true)
+        isVibrationON = JetDB.getBoolean(this, "vibration", true)
+        hideImageViews()
 
-        imageView.visibility = View.INVISIBLE
-        imageView2.visibility = View.INVISIBLE
-        imageView3.visibility = View.INVISIBLE
-        imageView4.visibility = View.INVISIBLE
-        imageView5.visibility = View.INVISIBLE
-        imageView6.visibility = View.INVISIBLE
-        
         imageView.setOnClickListener {
             update(imageView)
         }
-        imageView2.setOnClickListener{
+        imageView2.setOnClickListener {
             update(imageView2)
         }
-        imageView3.setOnClickListener{
+        imageView3.setOnClickListener {
             update(imageView3)
         }
-        imageView4.setOnClickListener{
+        imageView4.setOnClickListener {
             update(imageView4)
         }
-        imageView5.setOnClickListener{
+        imageView5.setOnClickListener {
             update(imageView5)
         }
-        imageView6.setOnClickListener{
+        imageView6.setOnClickListener {
             update(imageView6)
         }
-        button.setOnClickListener{
+        button.setOnClickListener {
             left = 5
             score = 0
             tv_lives.text = "Lives : $left"
@@ -84,42 +87,44 @@ class GameActivity : AppCompatActivity() {
             handler = Handler()
             runnable = Runnable {
                 theGameActions()
+                isRunnin = true
             }
             handler.postDelayed(runnable, 1000)
             button.visibility = View.INVISIBLE
         }
     }
+
     @SuppressLint("ResourceType")
-    private fun theGameActions(){
+    private fun theGameActions() {
         when {
             score!! < 100 -> {
                 fps = 1000
             }
             score!! < 200 -> {
-                fps = 950
-            }
-            score!! < 300 -> {
                 fps = 900
             }
             score!! < 400 -> {
-                fps = 850
-            }
-            score!! < 500 -> {
                 fps = 800
             }
-            score!! < 700 -> {
+            score!! < 600 -> {
                 fps = 750
             }
-            score!! < 900 -> {
+            score!! < 800 -> {
                 fps = 700
+            }
+            score!! < 1000 -> {
+                fps = 650
+            }
+            score!! < 1500 -> {
+                fps = 600
             }
 
         }
         try {
-             animationDrawable =
-                ContextCompat.getDrawable(this@GameActivity,R.anim.anim) as AnimationDrawable
+            animationDrawable =
+                ContextCompat.getDrawable(this@GameActivity, R.anim.anim) as AnimationDrawable
         } catch (e: Exception) {
-            Toast.makeText(this,e.localizedMessage,Toast.LENGTH_LONG).show()
+            Toast.makeText(this, e.localizedMessage, Toast.LENGTH_LONG).show()
         }
 
         do {
@@ -164,21 +169,10 @@ class GameActivity : AppCompatActivity() {
 
         handler1 = Handler()
         runnable1 = Runnable {
-            imageView.visibility = View.INVISIBLE
-            imageView2.visibility = View.INVISIBLE
-            imageView3.visibility = View.INVISIBLE
-            imageView4.visibility = View.INVISIBLE
-            imageView5.visibility = View.INVISIBLE
-            imageView6.visibility = View.INVISIBLE
+            isRunnin = true
+            hideImageViews()
 
-            imageView.isEnabled = false
-            imageView2.isEnabled = false
-            imageView3.isEnabled = false
-            imageView4.isEnabled = false
-            imageView5.isEnabled = false
-            imageView6.isEnabled = false
-
-            when(templeft){
+            when (templeft) {
                 0 -> {
                     left = left?.minus(1)
                     tv_lives.text = "Lives : $left"
@@ -188,9 +182,9 @@ class GameActivity : AppCompatActivity() {
                 }
             }
 
-            if (left!! < 1){
+            if (left!! < 1) {
                 gameOver()
-            }else {
+            } else {
                 theGameActions()
             }
         }
@@ -198,8 +192,17 @@ class GameActivity : AppCompatActivity() {
     }
 
 
-    private fun update(view:ImageView){
-        window.decorView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
+    private fun update(view: ImageView) {
+        if (isSoundON) {
+            playAudioEffect()
+        }
+        if (isVibrationON) {
+            window.decorView.performHapticFeedback(
+                HapticFeedbackConstants.VIRTUAL_KEY,
+                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+            )
+        }
+
         templeft = 1
         view.setImageResource(R.drawable.hit)
         score = score?.plus(10)
@@ -208,9 +211,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val highscore = JetDB.getInt(this,"highscore",0)
-        if (score!! > highscore){
-            JetDB.putInt(this,score!!,"highscore")
+        val highscore = JetDB.getInt(this, "highscore", 0)
+        if (score!! > highscore) {
+            JetDB.putInt(this, score!!, "highscore")
             GoogleSignIn.getLastSignedInAccount(this)?.let {
                 Games.getLeaderboardsClient(this, it)
                     .submitScore(getString(R.string.leaderboard_score), score!!.toLong())
@@ -218,31 +221,24 @@ class GameActivity : AppCompatActivity() {
         }
         if (mInterstitialAd.isLoaded) {
             mInterstitialAd.show()
-        }else{
+        } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.")
         }
-        handler.removeCallbacks(runnable)
-        handler1.removeCallbacks(runnable1)
+
+        if (isRunnin) {
+            handler.removeCallbacks(runnable)
+            handler1.removeCallbacks(runnable1)
+        }
         super.onBackPressed()
     }
 
     override fun onPause() {
-        handler.removeCallbacks(runnable)
-        handler1.removeCallbacks(runnable1)
+        if (isRunnin) {
+            handler.removeCallbacks(runnable)
+            handler1.removeCallbacks(runnable1)
+        }
 
-        imageView.visibility = View.INVISIBLE
-        imageView2.visibility = View.INVISIBLE
-        imageView3.visibility = View.INVISIBLE
-        imageView4.visibility = View.INVISIBLE
-        imageView5.visibility = View.INVISIBLE
-        imageView6.visibility = View.INVISIBLE
-
-        imageView.isEnabled = false
-        imageView2.isEnabled = false
-        imageView3.isEnabled = false
-        imageView4.isEnabled = false
-        imageView5.isEnabled = false
-        imageView6.isEnabled = false
+        hideImageViews()
 
         button.visibility = View.VISIBLE
         val highscore = JetDB.getInt(this, "highscore", 0)
@@ -254,19 +250,9 @@ class GameActivity : AppCompatActivity() {
 
 
     private fun gameOver() {
-        imageView.visibility = View.INVISIBLE
-        imageView2.visibility = View.INVISIBLE
-        imageView3.visibility = View.INVISIBLE
-        imageView4.visibility = View.INVISIBLE
-        imageView5.visibility = View.INVISIBLE
-        imageView6.visibility = View.INVISIBLE
 
-        imageView.isEnabled = false
-        imageView2.isEnabled = false
-        imageView3.isEnabled = false
-        imageView4.isEnabled = false
-        imageView5.isEnabled = false
-        imageView6.isEnabled = false
+        hideImageViews()
+
         val highscore = JetDB.getInt(this, "highscore", 0)
         if (score!! > highscore) {
             JetDB.putInt(this, score!!, "highscore")
@@ -291,5 +277,34 @@ class GameActivity : AppCompatActivity() {
             .setCancelableOnOutsideTouch(false)
             .build()
         button.visibility = View.VISIBLE
+    }
+
+    private fun hideImageViews() {
+        imageView.visibility = View.INVISIBLE
+        imageView2.visibility = View.INVISIBLE
+        imageView3.visibility = View.INVISIBLE
+        imageView4.visibility = View.INVISIBLE
+        imageView5.visibility = View.INVISIBLE
+        imageView6.visibility = View.INVISIBLE
+
+        imageView.isEnabled = false
+        imageView2.isEnabled = false
+        imageView3.isEnabled = false
+        imageView4.isEnabled = false
+        imageView5.isEnabled = false
+        imageView6.isEnabled = false
+    }
+
+    private fun playAudioEffect() {
+        try {
+            if (mp.isPlaying) {
+                mp.stop()
+                mp.release()
+                mp = MediaPlayer.create(this, R.raw.click)
+            }
+            mp.start()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 }
